@@ -28,7 +28,7 @@ Uma aplicação web gamificada para testar conhecimentos em TI, desenvolvida com
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/quiz-ti.git
+git clone https://github.com/HorstFSeifert/quiz-ti.git
 cd quiz-ti
 ```
 
@@ -137,6 +137,6 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 📧 Contato
 
-Seu Nome - [@seu_twitter](https://twitter.com/seu_twitter) - email@exemplo.com
+HorstFSeifert - [GitHub](https://github.com/HorstFSeifert)
 
-Link do Projeto: [https://github.com/seu-usuario/quiz-ti](https://github.com/seu-usuario/quiz-ti) 
+Link do Projeto: [https://github.com/HorstFSeifert/quiz-ti](https://github.com/HorstFSeifert/quiz-ti) 
