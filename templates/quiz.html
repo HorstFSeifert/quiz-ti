@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz TI - Quiz{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Quiz Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">{{ quiz.category_name }}</h1>
+                <p class="text-gray-600">Dificuldade: {{ quiz.difficulty_name }}</p>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-blue-600">Questão {{ current_question }}/{{ total_questions }}</p>
+                {% if config.ENABLE_TIMER %}
+                <p class="text-gray-600" id="timer">Tempo: 00:00</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Card -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">{{ question.text }}</h2>
+            
+            {% if question.image_url %}
+            <div class="mb-6">
+                <img src="{{ question.image_url }}" alt="Imagem da questão" class="max-w-full rounded-lg">
+            </div>
+            {% endif %}
+        </div>
+
+        <form id="quizForm" action="{{ url_for('submit_quiz') }}" method="POST">
+            <input type="hidden" name="question_id" value="{{ question.question_id }}">
+            <input type="hidden" name="quiz_id" value="{{ quiz.quiz_id }}">
+            
+            <div class="space-y-4">
+                {% for alternative in question.alternatives %}
+                <div class="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition duration-300">
+                    <input type="radio" name="answer" value="{{ alternative.alternative_id }}" 
+                           id="alt{{ alternative.alternative_id }}" class="h-4 w-4 text-blue-600">
+                    <label for="alt{{ alternative.alternative_id }}" class="ml-3 text-gray-700">
+                        {{ alternative.text }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button type="button" onclick="history.back()" 
+                        class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition duration-300">
+                    Voltar
+                </button>
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
+                    Próxima Questão
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ (current_question/total_questions)*100 }}%"></div>
+        </div>
+    </div>
+</div>
+
+{% if config.ENABLE_TIMER %}
+{% block scripts %}
+<script>
+    let timeLeft = 60; // 1 minuto por questão
+    const timerElement = document.getElementById('timer');
+    
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft > 0) {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            document.getElementById('quizForm').submit();
+        }
+    }
+    
+    updateTimer();
+</script>
+{% endblock %}
+{% endif %}
+{% endblock %} 

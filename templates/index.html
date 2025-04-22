@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz TI - Início{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Hero Section -->
+    <div class="text-center py-16">
+        <h1 class="text-5xl font-bold text-gray-800 mb-4">Teste seus conhecimentos em TI</h1>
+        <p class="text-xl text-gray-600 mb-8">Desafie-se com perguntas sobre programação, banco de dados, redes e muito mais!</p>
+        {% if not session.user_id %}
+            <div class="space-x-4">
+                <a href="{{ url_for('register') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Começar Agora
+                </a>
+                <a href="{{ url_for('login') }}" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition duration-300">
+                    Fazer Login
+                </a>
+            </div>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                Ir para Dashboard
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Features Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-16">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-blue-600 text-4xl mb-4">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Gamificação</h3>
+            <p class="text-gray-600">Ganhe pontos, suba de nível e desbloqueie conquistas enquanto aprende.</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-blue-600 text-4xl mb-4">
+                <i class="fas fa-book"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Diversas Categorias</h3>
+            <p class="text-gray-600">Teste seus conhecimentos em diferentes áreas da Tecnologia da Informação.</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-blue-600 text-4xl mb-4">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Ranking Global</h3>
+            <p class="text-gray-600">Compare seu desempenho com outros usuários e suba no ranking.</p>
+        </div>
+    </div>
+
+    <!-- Categories Preview -->
+    <div class="py-16">
+        <h2 class="text-3xl font-bold text-center mb-8">Categorias Disponíveis</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                <i class="fab fa-python text-4xl text-blue-600 mb-2"></i>
+                <h4 class="font-bold">Python</h4>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                <i class="fas fa-database text-4xl text-blue-600 mb-2"></i>
+                <h4 class="font-bold">SQL</h4>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                <i class="fas fa-network-wired text-4xl text-blue-600 mb-2"></i>
+                <h4 class="font-bold">Redes</h4>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md text-center">
+                <i class="fas fa-shield-alt text-4xl text-blue-600 mb-2"></i>
+                <h4 class="font-bold">Segurança</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="py-16">
+        <h2 class="text-3xl font-bold text-center mb-8">O que os usuários dizem</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">"Ótima forma de testar meus conhecimentos e aprender coisas novas!"</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                    <div>
+                        <h4 class="font-bold">João Silva</h4>
+                        <p class="text-sm text-gray-500">Desenvolvedor Python</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">"O sistema de gamificação torna o aprendizado muito mais divertido!"</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                    <div>
+                        <h4 class="font-bold">Maria Oliveira</h4>
+                        <p class="text-sm text-gray-500">Analista de Dados</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">"Perfeito para revisar conceitos e se preparar para entrevistas."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                    <div>
+                        <h4 class="font-bold">Carlos Santos</h4>
+                        <p class="text-sm text-gray-500">Engenheiro de Software</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

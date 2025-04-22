@@ -1,0 +1,789 @@
+Documento de Especificação Técnica - Aplicação de Quiz em TI
+1. Introdução
+Este documento descreve as funcionalidades, regras de negócio, fluxos e requisitos para o desenvolvimento de uma aplicação de Quiz em Tecnologia da Informação (TI), voltada para estudantes e profissionais que desejam testar seus conhecimentos.
+
+A aplicação será desenvolvida em Flask (Python) e MySQL, com foco em:
+
+Experiência gamificada (pontos, níveis, ranking, conquistas).
+
+Diversidade de perguntas (múltipla escolha e resposta escrita).
+
+Área administrativa para gestão de perguntas e usuários.
+
+2. Requisitos Funcionais
+2.1 Módulo de Autenticação e Perfil
+Cadastro de Usuário:
+
+Nome, e-mail e senha.
+
+Validação de e-mail único.
+
+Senha criptografada (hash).
+
+Login/Logout:
+
+Sessão persistente.
+
+Redirecionamento para dashboard após login.
+
+Recuperação de Senha:
+
+Envio de link por e-mail para redefinição.
+
+Perfil do Usuário:
+
+Visualização de nível, pontos, conquistas e histórico.
+
+2.2 Módulo de Quiz
+Tipos de Perguntas
+Múltipla Escolha (A, B, C, D):
+
+Enunciado + 4 alternativas (1 correta).
+
+Exemplo: "Qual comando SQL seleciona todos os registros de uma tabela?"
+
+Resposta Escrita (Completar/Descrever):
+
+Completar frase (*"O protocolo ______ é usado para envio de e-mails."*).
+
+Descrever saída de código ("Qual o retorno de print(2 + '2') em Python?").
+
+Fluxo do Quiz
+Usuário seleciona categoria (Python, SQL, Redes, etc.) e dificuldade (Fácil, Médio, Difícil).
+
+Perguntas são exibidas sequencialmente, com:
+
+Temporizador (opcional, dependendo da dificuldade).
+
+Feedback imediato após resposta.
+
+Ao final, o sistema calcula:
+
+Pontuação total.
+
+Nível de acerto (porcentagem).
+
+Conquistas desbloqueadas (se aplicável).
+
+2.3 Sistema de Progressão (Gamificação)
+Pontuação
+Múltipla escolha:
+
+Fácil: 10 pts | Médio: 20 pts | Difícil: 30 pts.
+
+Resposta escrita:
+
+Correção automática (comparação com gabarito).
+
+Pontuação variável (ex: 15 pts se 100% correto, 5 pts se parcial).
+
+Bônus:
+
+Acertos consecutivos (+10% a cada 3 seguidos).
+
+Tempo de resposta (se habilitado).
+
+Níveis e Ranking
+Níveis:
+
+Baseados em pontos acumulados (ex: Iniciante 0-100 pts, Guru 5000+ pts).
+
+Cada nível desbloqueia badges (ex: "Mestre em Python").
+
+Ranking Global:
+
+Top 10 usuários por pontuação total.
+
+Filtros por categoria (melhores em SQL, Redes, etc.).
+
+2.4 Módulo Administrativo
+Acesso restrito (login de admin).
+
+CRUD de Perguntas:
+
+Adicionar/editar/excluir perguntas.
+
+Definir:
+
+Tipo (múltipla escolha ou resposta escrita).
+
+Categoria e dificuldade.
+
+Alternativas (se aplicável).
+
+Resposta correta (texto exato para respostas escritas).
+
+Gerenciamento de Usuários:
+
+Listar/banir usuários.
+
+Resetar pontuação (em casos de fraude).
+
+Relatórios:
+
+Perguntas mais erradas.
+
+Desempenho médio por categoria.
+
+3. Requisitos Não-Funcionais
+Segurança:
+
+Proteção contra SQL injection.
+
+Hash de senhas (bcrypt).
+
+Performance:
+
+Tempo de resposta < 500ms.
+
+Suporte a 100+ usuários simultâneos.
+
+Usabilidade:
+
+Interface responsiva (mobile/desktop).
+
+Feedback visual claro (acertos/erros).
+
+Escalabilidade:
+
+Banco de dados otimizado para consultas rápidas.
+
+4. Regras de Negócio
+4.1 Validação de Respostas
+Múltipla escolha: Comparação com alternativa marcada como correta no banco.
+
+Resposta escrita:
+
+Comparação case-insensitive (ex: "SMTP" = "smtp").
+
+Tolerância a pequenos erros (ex: "JavaScript" vs "Javascript").
+
+4.2 Progressão de Nível
+Fórmula:
+
+Nível = floor(pontos_totais / 100) + 1 (ex: 350 pts = Nível 4).
+
+Badges:
+
+Concedidas ao atingir metas (ex: "100 pontos em Python").
+
+4.3 Temporizador (Opcional)
+Dificuldade:
+
+Fácil: 30s por pergunta.
+
+Médio: 20s.
+
+Difícil: 10s.
+
+Efeito na pontuação:
+
+Bônus de +20% se responder antes de 50% do tempo.
+
+5. Fluxo de Funcionalidades
+5.1 Fluxo do Usuário
+Cadastro → Login → Dashboard (escolher quiz).
+
+Responder perguntas → Ver resultado → Subir de nível.
+
+Consultar ranking → Ver conquistas → Repetir quiz.
+
+5.2 Fluxo do Administrador
+Login admin → Painel de controle.
+
+Adicionar pergunta → Definir tipo/categoria.
+
+Gerenciar usuários → Analisar relatórios.
+
+6. Melhorias Futuras (Roadmap)
+Modo multiplayer (desafio entre usuários).
+
+Sistema de vidas (ex: 3 erros encerram o quiz).
+
+Integração com APIs (ex: GitHub para verificar projetos).
+
+7. Conclusão
+Este documento define a estrutura completa da aplicação, desde a jornada do usuário até as regras de pontuação e administração. O próximo passo é:
+
+Validar requisitos com stakeholders.
+
+Prototipar interfaces (Figma/PDF).
+
+Iniciar desenvolvimento por módulos (auth → quiz → admin).
+
+Pronto para aprovação? Ou deseja ajustar alguma regra de negócio?
+
+
+Documentação Técnica Completa - Aplicação de Quiz em TI
+Sumário
+
+Visão Geral
+Arquitetura do Sistema
+Modelo de Dados
+Regras de Negócio
+Fluxos de Usuário
+API REST
+Interfaces de Usuário
+Segurança
+Testes
+Implantação
+Manutenção e Escalabilidade
+Extensões Futuras
+
+1. Visão Geral
+1.1 Objetivo
+A aplicação de Quiz em TI é uma plataforma gamificada projetada para estudantes e profissionais de tecnologia testarem e aprimorarem seus conhecimentos em diversas áreas de TI. O sistema combina elementos de aprendizado com gamificação para criar uma experiência envolvente e educativa.
+1.2 Tecnologias
+
+Backend: Flask (Python)
+Frontend: HTML5, CSS3, JavaScript (com possibilidade de framework como Vue.js)
+Banco de Dados: MySQL
+Servidor Web: Apache (XAMPP)
+Autenticação: JWT (JSON Web Tokens)
+
+1.3 Principais Funcionalidades
+
+Sistema de autenticação e perfis de usuário
+Múltiplas categorias e níveis de dificuldade
+Diversos tipos de perguntas (múltipla escolha, resposta escrita)
+Sistema de pontuação, níveis e conquistas
+Ranking global e por categoria
+Painel administrativo para gerenciamento de conteúdo
+
+2. Arquitetura do Sistema
+2.1 Visão Geral da Arquitetura
+A aplicação segue uma arquitetura cliente-servidor em camadas:
++------------------+     +------------------+     +------------------+
+|                  |     |                  |     |                  |
+|  Cliente         |<--->|  Servidor Flask  |<--->|  Banco de Dados  |
+|  (Navegador)     |     |  (API REST)      |     |  (MySQL)         |
+|                  |     |                  |     |                  |
++------------------+     +------------------+     +------------------+
+2.2 Componentes do Sistema
+
+Camada de Apresentação: Interface de usuário responsiva acessada via navegador
+Camada de Aplicação: API REST implementada em Flask
+Camada de Serviços: Lógica de negócio e processamento
+Camada de Acesso a Dados: Interação com o banco de dados MySQL
+Camada de Infraestrutura: Autenticação, logging, cache
+
+2.3 Integração com Serviços Externos
+
+Serviço de e-mail para recuperação de senha e notificações
+Possibilidade de integração com redes sociais (login via Google, Facebook)
+Armazenamento de imagens para badges e avatares de usuários
+
+3. Modelo de Dados
+3.1 Diagrama de Entidade-Relacionamento
+O banco de dados é composto pelas seguintes entidades principais:
+
+Users: Cadastro e informações dos usuários
+Questions: Banco de perguntas
+Categories: Categorias das perguntas
+Difficulties: Níveis de dificuldade
+QuizSessions: Sessões de quiz criadas pelos usuários
+UserAnswers: Respostas dadas pelos usuários
+Badges: Conquistas desbloqueáveis
+Levels: Níveis de progressão dos usuários
+
+3.2 Relacionamentos Principais
+
+Um usuário pode participar de várias sessões de quiz (1)
+Uma sessão de quiz contém várias respostas de usuário (1)
+Uma pergunta possui uma categoria e uma dificuldade (N:1)
+Uma pergunta de múltipla escolha possui várias alternativas (1)
+Um usuário pode conquistar várias badges (N)
+Usuários acumulam pontos em diferentes categorias (N)
+
+3.3 Tabelas e Campos Críticos
+Veja detalhamento completo no script SQL fornecido anteriormente. Principais tabelas:
+
+users: Informações de usuário, autenticação e progresso
+questions: Repositório de perguntas com metadados
+alternatives: Opções para perguntas de múltipla escolha
+written_answers: Gabarito para perguntas de resposta escrita
+quiz_sessions: Registro de sessões de quiz
+user_answers: Histórico de respostas dos usuários
+badges: Conquistas disponíveis no sistema
+user_badges: Relação de badges conquistadas por usuários
+
+4. Regras de Negócio
+4.1 Autenticação e Perfil
+4.1.1 Registro de Usuário
+
+Nome completo, e-mail e senha são obrigatórios
+E-mail deve ser único no sistema
+Senha deve ter no mínimo 8 caracteres, incluindo letras e números
+Senha deve ser armazenada usando hash bcrypt
+
+4.1.2 Login
+
+Autenticação via e-mail e senha
+Criação de token JWT com validade de 24 horas
+Refresh token com validade de 7 dias
+Bloqueio temporário após 5 tentativas de login mal-sucedidas
+
+4.1.3 Recuperação de Senha
+
+Token único gerado e enviado por e-mail
+Validade de 1 hora para o token de recuperação
+Limite de 3 solicitações de recuperação por dia
+
+4.2 Sistema de Quiz
+4.2.1 Seleção de Quiz
+
+O usuário escolhe uma categoria e nível de dificuldade
+O sistema seleciona 10 perguntas aleatórias (configurável) que atendam aos critérios
+Usuário não recebe perguntas que já respondeu corretamente (opcional, configurável)
+
+4.2.2 Resposta às Perguntas
+
+Tempo limite para resposta baseado na dificuldade:
+
+Fácil: 30 segundos por pergunta
+Médio: 20 segundos por pergunta
+Difícil: 10 segundos por pergunta
+
+
+Temporizador opcional (pode ser desativado nas configurações)
+Feedback imediato após cada resposta
+
+4.2.3 Avaliação de Respostas
+
+Múltipla Escolha:
+
+Comparação direta com o gabarito
+Uma única alternativa correta
+
+
+Resposta Escrita:
+
+Comparação case-insensitive com o gabarito
+Suporte a respostas alternativas (sinônimos)
+Tolerância a pequenos erros ortográficos (configurável)
+Validação parcial para respostas parcialmente corretas
+
+
+
+4.2.4 Finalização do Quiz
+
+Exibição de pontuação total
+Cálculo da taxa de acerto (porcentagem)
+Exibição de badges conquistadas
+Atualização automática de ranking e nível
+
+4.3 Sistema de Pontuação e Gamificação
+4.3.1 Cálculo de Pontos
+
+Pontuação base por pergunta:
+
+Múltipla escolha:
+
+Fácil: 10 pontos
+Médio: 20 pontos
+Difícil: 30 pontos
+
+
+Resposta escrita:
+
+Fácil: 15 pontos
+Médio: 25 pontos
+Difícil: 35 pontos
+
+
+
+
+Modificadores:
+
+Bônus por tempo: +20% se responder antes de 50% do tempo limite
+Bônus por sequência: +10% a cada 3 acertos consecutivos
+Resposta parcial: 30-70% dos pontos (apenas para perguntas escritas)
+
+
+
+4.3.2 Sistema de Níveis
+
+Níveis baseados em pontuação total:
+
+Iniciante: 0-99 pontos
+Aprendiz: 100-499 pontos
+Desenvolvedor: 500-999 pontos
+Especialista: 1000-2499 pontos
+Mestre: 2500-4999 pontos
+Guru: 5000+ pontos
+
+
+Fórmula para cálculo de nível:
+nível = floor(pontos_totais / 100) + 1
+
+
+4.3.3 Sistema de Badges
+
+Categorias de badges:
+
+Gerais (independentes de categoria)
+Específicas por categoria (Python, SQL, etc.)
+Por performance (acertos consecutivos, velocidade)
+
+
+Condições de conquista:
+
+Pontuação total acumulada
+Pontuação em categoria específica
+Número de quizzes completados
+Acertos consecutivos
+Taxa de acerto (porcentagem)
+
+
+
+4.3.4 Sistema de Ranking
+
+Ranking global baseado em pontuação total
+Ranking por categoria (melhores em Python, SQL, etc.)
+Atualização em tempo real
+Exibição dos 10 melhores usuários (configurável)
+
+4.4 Administração
+4.4.1 Gerenciamento de Perguntas
+
+CRUD completo (Criar, Ler, Atualizar, Excluir)
+Verificação de duplicidade
+Revisão de qualidade antes da publicação
+Desativação temporária de perguntas
+
+4.4.2 Gerenciamento de Usuários
+
+Visualização de todos os usuários
+Ativação/desativação de contas
+Reset de senha
+Visualização de estatísticas por usuário
+Remoção de pontos em caso de fraude
+
+4.4.3 Relatórios e Estatísticas
+
+Perguntas mais erradas
+Desempenho médio por categoria
+Taxa global de acertos
+Badges mais/menos conquistadas
+Tempo médio de resposta por dificuldade
+
+5. Fluxos de Usuário
+5.1 Fluxo de Autenticação
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│             │     │             │     │             │
+│  Página     │────>│  Login      │────>│ Dashboard   │
+│  Inicial    │     │             │     │             │
+│             │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘
+      │                    ↑                   ↑
+      │                    │                   │
+      ▼                    │                   │
+┌─────────────┐     ┌─────────────┐           │
+│             │     │             │           │
+│  Cadastro   │────>│ Confirmação │───────────┘
+│             │     │ Email       │
+│             │     │             │
+└─────────────┘     └─────────────┘
+      │
+      │
+      ▼
+┌─────────────┐     ┌─────────────┐
+│             │     │             │
+│ Esqueceu    │────>│ Reset de    │
+│ a Senha?    │     │ Senha       │
+│             │     │             │
+└─────────────┘     └─────────────┘
+5.2 Fluxo de Quiz
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│             │     │             │     │             │
+│ Dashboard   │────>│ Seleção de  │────>│ Instruções  │
+│             │     │ Quiz        │     │             │
+│             │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                               │
+                                               │
+                                               ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│             │     │             │     │             │
+│ Resultado   │<────│ Feedback    │<────│ Pergunta    │
+│ Final       │     │ Imediato    │─┐   │ do Quiz     │
+│             │     │             │ │   │             │
+└─────────────┘     └─────────────┘ │   └─────────────┘
+      │                             └─────────┐
+      │                                       │
+      ▼                                       ▼
+┌─────────────┐                        ┌─────────────┐
+│             │                        │             │
+│ Visualizar  │                        │ Próxima     │
+│ Ranking     │                        │ Pergunta    │
+│             │                        │             │
+└─────────────┘                        └─────────────┘
+5.3 Fluxo de Perfil e Conquistas
+┌─────────────┐     ┌─────────────┐
+│             │     │             │
+│ Dashboard   │────>│ Perfil do   │
+│             │     │ Usuário     │
+│             │     │             │
+└─────────────┘     └─────────────┘
+                          │
+          ┌──────────────┬──────────────┐
+          │              │              │
+          ▼              ▼              ▼
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│             │  │             │  │             │
+│ Estatísticas│  │ Badges      │  │ Histórico   │
+│             │  │ Conquistas  │  │ de Quiz     │
+│             │  │             │  │             │
+└─────────────┘  └─────────────┘  └─────────────┘
+5.4 Fluxo de Administração
+┌─────────────┐     ┌─────────────┐
+│             │     │             │
+│ Login Admin │────>│ Painel      │
+│             │     │ Admin       │
+│             │     │             │
+└─────────────┘     └─────────────┘
+                          │
+    ┌──────────┬──────────┼──────────┬──────────┐
+    │          │          │          │          │
+    ▼          ▼          ▼          ▼          ▼
+┌─────────┐┌─────────┐┌─────────┐┌─────────┐┌─────────┐
+│         ││         ││         ││         ││         │
+│Perguntas││Usuários ││Categorias││Relatórios││Sistema  │
+│         ││         ││         ││         ││         │
+└─────────┘└─────────┘└─────────┘└─────────┘└─────────┘
+6. API REST
+6.1 Autenticação API
+EndpointMétodoDescriçãoParâmetrosResposta/api/auth/registerPOSTRegistrar novo usuárioname, email, passworduser_id, token/api/auth/loginPOSTAutenticar usuárioemail, passwordtoken, refresh_token/api/auth/refreshPOSTRenovar tokenrefresh_tokentoken, refresh_token/api/auth/forgot-passwordPOSTSolicitar reset de senhaemailsuccess, message/api/auth/reset-passwordPOSTResetar senhatoken, new_passwordsuccess, message/api/auth/logoutPOSTInvalidar tokentokensuccess
+6.2 API de Usuário
+EndpointMétodoDescriçãoParâmetrosResposta/api/user/profileGETObter perfil do usuário-user_data/api/user/profilePUTAtualizar perfilname, [avatar]user_data/api/user/change-passwordPOSTTrocar senhacurrent_password, new_passwordsuccess/api/user/statisticsGETObter estatísticas[category_id]stats_data/api/user/badgesGETListar badges-badges_list/api/user/historyGETHistórico de quizzes[page], [limit]quiz_history
+6.3 API de Quiz
+EndpointMétodoDescriçãoParâmetrosResposta/api/categoriesGETListar categorias-categories/api/difficultiesGETListar dificuldades-difficulties/api/quiz/startPOSTIniciar quizcategory_id, difficulty_idsession_id, questions/api/quiz/question/:idGETDetalhes da pergunta-question_data/api/quiz/answerPOSTEnviar respostasession_id, question_id, answer_data, timeresult, correct_answer/api/quiz/completePOSTFinalizar quizsession_idscore, accuracy, badges_earned
+6.4 API de Ranking
+EndpointMétodoDescriçãoParâmetrosResposta/api/ranking/globalGETRanking global[limit]ranking_data/api/ranking/category/:idGETRanking por categoria[limit]ranking_data/api/ranking/positionGETPosição do usuário[category_id]user_position
+6.5 API de Administração
+EndpointMétodoDescriçãoParâmetrosResposta/api/admin/questionsGETListar perguntas[page], [filters]questions_list/api/admin/questionsPOSTCriar perguntaquestion_dataquestion_id/api/admin/questions/:idPUTAtualizar perguntaquestion_datasuccess/api/admin/questions/:idDELETERemover pergunta-success/api/admin/usersGETListar usuários[page], [filters]users_list/api/admin/users/:idPUTAtualizar usuáriouser_datasuccess/api/admin/reportsGETGerar relatóriosreport_type, [filters]report_data
+6.6 Exemplos de Payload
+6.6.1 Iniciar Quiz (Response)
+json{
+  "success": true,
+  "session_id": 123,
+  "questions": [
+    {
+      "id": 42,
+      "content": "Qual é a função utilizada para imprimir texto no console em Python?",
+      "type_id": 1,
+      "time_limit": 30,
+      "alternatives": [
+        {"id": 101, "content": "print()"},
+        {"id": 102, "content": "echo()"},
+        {"id": 103, "content": "console.log()"},
+        {"id": 104, "content": "write()"}
+      ]
+    },
+    // ... mais perguntas
+  ]
+}
+6.6.2 Enviar Resposta (Request)
+json{
+  "session_id": 123,
+  "question_id": 42,
+  "alternative_id": 101,  // Para múltipla escolha
+  "written_response": null,  // Para resposta escrita
+  "response_time": 12  // Tempo em segundos
+}
+6.6.3 Enviar Resposta (Response)
+json{
+  "success": true,
+  "is_correct": true,
+  "points_earned": 15,
+  "correct_answer": "print()",
+  "explanation": "Em Python, a função print() é utilizada para exibir texto no console.",
+  "consecutive_correct": 3
+}
+7. Interfaces de Usuário
+7.1 Páginas Principais
+7.1.1 Página Inicial (Landing Page)
+
+Apresentação do sistema
+Chamada para registro/login
+Destaques de funcionalidades
+Estatísticas globais (usuários, perguntas, categorias)
+Testemunhos ou ranking parcial
+
+7.1.2 Registro e Login
+
+Formulário de registro
+Formulário de login
+Recuperação de senha
+Login social (opcional)
+
+7.1.3 Dashboard do Usuário
+
+Resumo de estatísticas
+Últimos quizzes realizados
+Badges recentes
+Categorias disponíveis
+Acesso rápido para iniciar quiz
+
+7.1.4 Seleção de Quiz
+
+Lista de categorias com ícones
+Seleção de dificuldade
+Descrição da categoria selecionada
+Estatísticas do usuário na categoria
+
+7.1.5 Interface de Quiz
+
+Enunciado da pergunta
+Alternativas ou campo de resposta
+Temporizador visual
+Indicador de progresso
+Contagem de pontos atual
+
+7.1.6 Resultado do Quiz
+
+Pontuação total
+Taxa de acerto
+Badges conquistadas
+Comparação com tentativas anteriores
+Gráfico de desempenho por categoria
+Botões para compartilhar resultado
+
+7.1.7 Perfil do Usuário
+
+Informações pessoais
+Estatísticas detalhadas
+Vitrine de badges
+Gráficos de progresso
+Histórico completo de quizzes
+
+7.1.8 Ranking
+
+Ranking global
+Ranking por categoria
+Posição do usuário destacada
+Filtros (últimos 7 dias, 30 dias, todos os tempos)
+
+7.2 Painel Administrativo
+7.2.1 Dashboard Admin
+
+Estatísticas globais
+Gráficos de atividade
+Alertas e notificações
+Acesso rápido às principais funções
+
+7.2.2 Gerenciamento de Perguntas
+
+Lista paginada com filtros
+Formulário de criação/edição
+Visualização de estatísticas por pergunta
+Validação de perguntas
+
+7.2.3 Gerenciamento de Usuários
+
+Lista de usuários com filtros
+Detalhes de perfil de usuário
+Opções de gestão (banir, resetar senha)
+Estatísticas de usuário
+
+7.2.4 Relatórios
+
+Geração de relatórios customizáveis
+Exportação em CSV/PDF
+Visualizações gráficas
+Métricas de desempenho
+
+7.3 Design Responsivo
+A aplicação deve seguir princípios de design responsivo para funcionar adequadamente em:
+
+Desktops e laptops
+Tablets
+Smartphones
+
+Pontos-chave:
+
+Layout adaptável
+Elementos touch-friendly para dispositivos móveis
+Otimização de performance para conexões lentas
+Economização de dados quando apropriado
+
+8. Segurança
+8.1 Autenticação e Autorização
+
+Senhas armazenadas com bcrypt (fator de custo 12+)
+Tokens JWT com expiração curta (24 horas)
+Refresh tokens com rotação
+CSRF protection
+Verificação de permissões por rota
+
+8.2 Proteção contra Vulnerabilidades Comuns
+
+SQLi: Uso de ORM e prepared statements
+XSS: Sanitização de input e output
+CSRF: Tokens anti-CSRF em formulários
+Injection: Validação rigorosa de input
+Brute force: Rate limiting e captcha
+Session fixation: Regeneração de sessão após login
+
+8.3 Privacidade de Dados
+
+Coleta apenas de dados necessários
+Opção de exclusão de conta pelo usuário
+Criptografia de dados sensíveis
+Compliance com LGPD/GDPR (conforme aplicável)
+Logs de auditoria para acesso a dados
+
+8.4 Segurança na Infraestrutura
+
+HTTPS obrigatório
+Headers de segurança apropriados
+Configuração segura do servidor web
+Backup regular do banco de dados
+Monitoramento de segurança
+
+9. Testes
+9.1 Testes Unitários
+
+Cobertura mínima de 80% para funções críticas
+Testes para regras de negócio
+Validação de cálculos de pontuação
+Validação de respostas escritas
+
+9.2 Testes de Integração
+
+Fluxo completo de quiz
+Autenticação e autorização
+Atualização de ranking
+Sistema de conquistas
+
+9.3 Testes de Interface
+
+Responsividade
+Acessibilidade (WCAG 2.1)
+Compatibilidade cross-browser
+Usabilidade em dispositivos móveis
+
+9.4 Testes de Carga
+
+Simulação com múltiplos usuários simultâneos
+Comportamento sob carga elevada
+Tempos de resposta aceitáveis
+Recuperação após falhas
+
+10. Implantação
+10.1 Requisitos de Ambiente
+
+XAMPP 8.0+ (Apache, MySQL, PHP)
+Python 3.8+
+Virtualenv/venv
+Git para controle de versão
+
+10.2 Processo de Implantação
+
+Configuração do ambiente virtual Python
+Instalação de dependências via pip
+Configuração do banco de dados MySQL
+Execução de migrations para criar estrutura DB
+Configuração do servidor web Apache
+Configuração de HTTPS (Let's Encrypt)
+Testes de validação da implantação

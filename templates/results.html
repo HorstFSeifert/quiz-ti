@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz TI - Resultados{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Results Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Quiz Concluído!</h1>
+            <p class="text-gray-600">Categoria: {{ quiz.category_name }} - Dificuldade: {{ quiz.difficulty_name }}</p>
+        </div>
+    </div>
+
+    <!-- Score Card -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4">
+                <div class="text-4xl font-bold text-blue-600">{{ score }}</div>
+                <p class="text-gray-600">Pontos</p>
+            </div>
+            <div class="text-center p-4">
+                <div class="text-4xl font-bold text-green-600">{{ correct_answers }}/{{ total_questions }}</div>
+                <p class="text-gray-600">Acertos</p>
+            </div>
+            <div class="text-center p-4">
+                <div class="text-4xl font-bold text-yellow-600">{{ accuracy }}%</div>
+                <p class="text-gray-600">Precisão</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Results -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Detalhes das Respostas</h2>
+        
+        <div class="space-y-6">
+            {% for result in detailed_results %}
+            <div class="border rounded-lg p-4 {% if result.is_correct %}bg-green-50{% else %}bg-red-50{% endif %}">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-semibold text-gray-800">Questão {{ loop.index }}</h3>
+                    <span class="px-3 py-1 rounded-full text-sm {% if result.is_correct %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {% if result.is_correct %}Correto{% else %}Incorreto{% endif %}
+                    </span>
+                </div>
+                <p class="text-gray-700 mb-2">{{ result.question_text }}</p>
+                <div class="text-sm">
+                    <p class="text-gray-600">Sua resposta: {{ result.user_answer }}</p>
+                    <p class="text-gray-600">Resposta correta: {{ result.correct_answer }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex flex-col md:flex-row justify-center gap-4">
+            <a href="{{ url_for('dashboard') }}" 
+               class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition duration-300 text-center">
+                Voltar ao Dashboard
+            </a>
+            <a href="{{ url_for('quiz', category_id=quiz.category_id, difficulty=quiz.difficulty) }}" 
+               class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 text-center">
+                Tentar Novamente
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
