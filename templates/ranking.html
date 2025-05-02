@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz TI - Ranking{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex flex-wrap gap-4">
+            <select id="categoryFilter" class="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Ranking Global</option>
+                {% for category in categories %}
+                <option value="{{ category.category_id }}" {% if selected_category == category.category_id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select id="periodFilter" class="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                <option value="all" {% if period == 'all' %}selected{% endif %}>Todo o Tempo</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Última Semana</option>
+                <option value="month" {% if period == 'month' %}selected{% endif %}>Último Mês</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Ranking -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 border-b">
+            <h2 class="text-2xl font-bold text-gray-800">
+                {% if selected_category %}
+                Ranking - {{ category_name }}
+                {% else %}
+                Ranking Global
+                {% endif %}
+            </h2>
+        </div>
+
+        <!-- Top 3 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-50">
+            {% for user in top_users[:3] %}
+            <div class="bg-white rounded-lg shadow p-6 text-center relative">
+                {% if loop.index == 1 %}
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <i class="fas fa-crown text-4xl text-yellow-400"></i>
+                </div>
+                {% endif %}
+                <div class="w-20 h-20 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <span class="text-3xl font-bold text-blue-600">{{ loop.index }}</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">{{ user.name }}</h3>
+                <p class="text-gray-600 mb-2">{{ user.level_name }}</p>
+                <p class="text-2xl font-bold text-blue-600">{{ user.total_points }} pontos</p>
+                <div class="mt-4 flex justify-center space-x-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ user.badges_count }} badges
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {{ "%.1f"|format(user.accuracy) }}% acertos
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Lista Completa -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Posição
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Usuário
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Nível
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Pontos
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Badges
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acurácia
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for user in ranking %}
+                    <tr class="{% if user.user_id == current_user.user_id %}bg-blue-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">
+                                {% if loop.index <= 3 %}
+                                <i class="fas fa-medal text-{{ ['yellow', 'gray', 'yellow-700']|random }}-400 mr-1"></i>
+                                {% endif %}
+                                {{ loop.index }}º
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ user.level_name }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-blue-600">{{ user.total_points }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {{ user.badges_count }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-1 h-2 bg-gray-200 rounded-full mr-2" style="width: 100px">
+                                    <div class="h-2 bg-green-500 rounded-full" style="width: {{ user.accuracy }}%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600">{{ "%.1f"|format(user.accuracy) }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if pagination.total_pages > 1 %}
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-700">
+                    Mostrando <span class="font-medium">{{ pagination.start }}</span> a 
+                    <span class="font-medium">{{ pagination.end }}</span> de 
+                    <span class="font-medium">{{ pagination.total }}</span> usuários
+                </div>
+                <div class="space-x-2">
+                    {% if pagination.prev_page %}
+                    <a href="{{ url_for('ranking', page=pagination.prev_page, category=selected_category, period=period) }}"
+                       class="px-3 py-1 border rounded-md hover:bg-gray-100">
+                        Anterior
+                    </a>
+                    {% endif %}
+                    
+                    {% if pagination.next_page %}
+                    <a href="{{ url_for('ranking', page=pagination.next_page, category=selected_category, period=period) }}"
+                       class="px-3 py-1 border rounded-md hover:bg-gray-100">
+                        Próxima
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    updateRanking();
+});
+
+document.getElementById('periodFilter').addEventListener('change', function() {
+    updateRanking();
+});
+
+function updateRanking() {
+    const category = document.getElementById('categoryFilter').value;
+    const period = document.getElementById('periodFilter').value;
+    
+    let url = '{{ url_for("ranking") }}?';
+    if (category) url += `category=${category}&`;
+    if (period) url += `period=${period}`;
+    
+    window.location.href = url;
+}
+</script>
+{% endblock %}
+{% endblock %} 

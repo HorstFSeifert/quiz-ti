@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz TI - Badges{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Resumo -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-4xl font-bold text-blue-600">{{ user.badges_count or 0 }}</div>
+                <div class="text-gray-600">Badges Conquistadas</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl font-bold text-blue-600">{{ total_badges or 0 }}</div>
+                <div class="text-gray-600">Total de Badges</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl font-bold text-blue-600">
+                    {% if total_badges > 0 %}
+                        {{ "%.1f"|format(user.badges_count / total_badges * 100) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+                <div class="text-gray-600">Progresso Total</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Badges Gerais -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Badges Gerais</h2>
+        {% if general_badges %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for badge in general_badges %}
+            <div class="bg-gray-50 rounded-lg p-4 {% if badge.badge_id in user_badges %}border-2 border-blue-500{% else %}border border-gray-200{% endif %}">
+                <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="{{ badge.icon }} text-2xl text-blue-600"></i>
+                </div>
+                <h3 class="font-medium text-gray-800 text-center mb-2">{{ badge.name }}</h3>
+                <p class="text-sm text-gray-600 text-center mb-3">{{ badge.description }}</p>
+                <div class="text-center">
+                    {% if badge.badge_id in user_badges %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check mr-1"></i> Conquistada em {{ user_badges[badge.badge_id].strftime('%d/%m/%Y') }}
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {{ badge.requirement }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-gray-600 py-8">
+            Nenhuma badge geral disponível no momento.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Badges por Categoria -->
+    {% for category in categories %}
+    {% if category.badges %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">{{ category.name }}</h2>
+            {% if category.category_id in category_progress %}
+            {% set progress = category_progress[category.category_id] %}
+            <div class="text-right">
+                <div class="text-sm text-gray-600">Progresso na Categoria</div>
+                <div class="text-lg font-medium text-blue-600">{{ progress.points or 0 }} pontos</div>
+                <div class="text-sm text-gray-600">
+                    Acurácia: 
+                    {% if progress and progress.questions_answered and progress.questions_answered > 0 %}
+                        {{ "%.1f"|format(progress.accuracy) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for badge in category.badges %}
+            <div class="bg-gray-50 rounded-lg p-4 {% if badge.badge_id in user_badges %}border-2 border-blue-500{% else %}border border-gray-200{% endif %}">
+                <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="{{ badge.icon }} text-2xl text-blue-600"></i>
+                </div>
+                <h3 class="font-medium text-gray-800 text-center mb-2">{{ badge.name }}</h3>
+                <p class="text-sm text-gray-600 text-center mb-3">{{ badge.description }}</p>
+                <div class="text-center">
+                    {% if badge.badge_id in user_badges %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check mr-1"></i> Conquistada em {{ user_badges[badge.badge_id].strftime('%d/%m/%Y') }}
+                    </span>
+                    {% else %}
+                    <div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {{ badge.requirement }}
+                        </span>
+                        {% if category.category_id in category_progress %}
+                        {% set progress = category_progress[category.category_id] %}
+                        <div class="mt-2">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                {% set points = progress.points if progress and progress.points else 0 %}
+                                {% set percentage = 100 if points >= badge.achievement_threshold else (points / badge.achievement_threshold * 100) %}
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ percentage }}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">
+                                {{ points }}/{{ badge.achievement_threshold }} pontos
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+    {% if not general_badges and not categories %}
+    <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+        <div class="text-gray-600 py-8">
+            Nenhuma badge disponível no momento. Continue participando dos quizzes para desbloquear conquistas!
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

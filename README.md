@@ -115,9 +115,9 @@ MAIL_DEFAULT_SENDER=seu_email@gmail.com
 - [x] Dashboard do usuário
 - [x] Sistema de quiz
 - [x] Página de resultados
+- [x] Sistema de conquistas
 
 ### Em Desenvolvimento 🚧
-- [ ] Sistema de conquistas
 - [ ] Ranking global
 - [ ] Painel administrativo
 - [ ] Recuperação de senha

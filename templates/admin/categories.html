@@ -1,0 +1,192 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quiz TI - Gerenciar Categorias{% endblock %}
+{% block page_title %}Gerenciar Categorias{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Actions -->
+    <div class="flex justify-between items-center">
+        <button onclick="showAddCategoryModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i> Nova Categoria
+        </button>
+        
+        <div class="flex space-x-4">
+            <input type="text" id="searchInput" placeholder="Pesquisar..." 
+                   class="rounded-lg border-gray-300">
+        </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for category in categories %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">{{ category.name }}</h3>
+                    <p class="text-gray-600">{{ category.description }}</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editCategory({{ category.category_id }})"
+                            class="text-blue-600 hover:text-blue-900">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteCategory({{ category.category_id }})"
+                            class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Total de Perguntas:</span>
+                    <span class="font-medium">{{ category.question_count }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Usuários Ativos:</span>
+                    <span class="font-medium">{{ category.active_users }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Taxa de Acerto:</span>
+                    <span class="font-medium">{{ "%.1f"|format(category.accuracy) }}%</span>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t">
+                <div class="text-sm text-gray-600">Distribuição por Dificuldade:</div>
+                <div class="flex justify-between mt-2">
+                    <div class="text-center">
+                        <div class="text-green-600 font-medium">{{ category.easy_count }}</div>
+                        <div class="text-xs text-gray-500">Fácil</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-yellow-600 font-medium">{{ category.medium_count }}</div>
+                        <div class="text-xs text-gray-500">Médio</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-red-600 font-medium">{{ category.hard_count }}</div>
+                        <div class="text-xs text-gray-500">Difícil</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add/Edit Category Modal -->
+<div id="categoryModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium" id="modalTitle">Nova Categoria</h3>
+            <button onclick="closeCategoryModal()" class="text-gray-600 hover:text-gray-900">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="categoryForm" method="POST" class="space-y-4">
+            <input type="hidden" name="category_id" id="categoryId">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Nome</label>
+                <input type="text" name="name" id="categoryName" required
+                       class="mt-1 block w-full rounded-md border-gray-300">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Descrição</label>
+                <textarea name="description" id="categoryDescription" rows="3"
+                          class="mt-1 block w-full rounded-md border-gray-300"></textarea>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Ícone</label>
+                <input type="text" name="icon" id="categoryIcon"
+                       class="mt-1 block w-full rounded-md border-gray-300"
+                       placeholder="Ex: python-icon">
+            </div>
+            
+            <div class="flex justify-end space-x-2">
+                <button type="button" onclick="closeCategoryModal()"
+                        class="px-4 py-2 border rounded-md hover:bg-gray-100">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showAddCategoryModal() {
+    document.getElementById('modalTitle').textContent = 'Nova Categoria';
+    document.getElementById('categoryId').value = '';
+    document.getElementById('categoryForm').reset();
+    document.getElementById('categoryModal').classList.remove('hidden');
+}
+
+function closeCategoryModal() {
+    document.getElementById('categoryModal').classList.add('hidden');
+}
+
+function editCategory(categoryId) {
+    fetch(`/admin/categories/${categoryId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('modalTitle').textContent = 'Editar Categoria';
+            document.getElementById('categoryId').value = data.category_id;
+            document.getElementById('categoryName').value = data.name;
+            document.getElementById('categoryDescription').value = data.description;
+            document.getElementById('categoryIcon').value = data.icon;
+            document.getElementById('categoryModal').classList.remove('hidden');
+        });
+}
+
+function deleteCategory(categoryId) {
+    if (confirm('Tem certeza que deseja excluir esta categoria? Todas as perguntas associadas serão excluídas.')) {
+        fetch(`/admin/categories/${categoryId}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro ao excluir categoria');
+                }
+            });
+    }
+}
+
+// Filtro de pesquisa
+document.getElementById('searchInput').addEventListener('input', debounce(function(e) {
+    const search = e.target.value.toLowerCase();
+    document.querySelectorAll('.category-card').forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        const description = card.querySelector('p').textContent.toLowerCase();
+        
+        if (name.includes(search) || description.includes(search)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}, 300));
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+</script>
+{% endblock %} 

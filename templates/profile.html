@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz TI - Perfil{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Informações do Perfil -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="text-center mb-6">
+                <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <span class="text-4xl text-blue-600">{{ user_info.name[0] | upper }}</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">{{ user_info.name }}</h2>
+                <p class="text-gray-600">{{ user_info.email }}</p>
+            </div>
+            
+            <div class="border-t pt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-600">Nível</span>
+                    <span class="font-bold text-blue-600">{{ user_info.level_name }}</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-600">Pontos Totais</span>
+                    <span class="font-bold text-blue-600">{{ user_info.total_points }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Badges Conquistadas</span>
+                    <span class="font-bold text-blue-600">{{ user_info.badges_count }}</span>
+                </div>
+            </div>
+            
+            <!-- Barra de Progresso para Próximo Nível -->
+            <div class="mt-6">
+                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Progresso para {{ next_level.level_name }}</span>
+                    <span>{{ progress.percentage }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ progress.percentage }}%"></div>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">
+                    {{ progress.points_needed }} pontos para o próximo nível
+                </p>
+            </div>
+        </div>
+
+        <!-- Estatísticas por Categoria -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Desempenho por Categoria</h3>
+            <div class="space-y-6">
+                {% for stat in category_stats %}
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-700">{{ stat.name }}</span>
+                        <span class="text-sm font-medium text-blue-600">{{ stat.points }} pontos</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Acurácia</span>
+                        <span>{{ "%.1f"|format(stat.accuracy) }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ stat.accuracy }}%"></div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">
+                        {{ stat.correct_answers }}/{{ stat.questions_answered }} questões respondidas
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Atividade Recente -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Atividade Recente</h3>
+            <div class="space-y-4">
+                {% for activity in recent_activity %}
+                <div class="border-l-4 border-blue-600 pl-4">
+                    <div class="text-sm text-gray-500">
+                        {{ activity.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                    <div class="text-gray-800">{{ activity.action_description }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Badges Recentes -->
+    <div class="mt-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">Badges Recentes</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for badge in badges %}
+            <div class="bg-white rounded-lg shadow-lg p-4 text-center">
+                <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    <i class="{{ badge.icon }} text-2xl text-blue-600"></i>
+                </div>
+                <h4 class="font-medium text-gray-800">{{ badge.name }}</h4>
+                <p class="text-sm text-gray-500">{{ badge.earned_at.strftime('%d/%m/%Y') }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

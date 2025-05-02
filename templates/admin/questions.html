@@ -1,0 +1,454 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Quiz TI - Gerenciar Perguntas{% endblock %}
+{% block page_title %}Gerenciar Perguntas{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Actions -->
+    <div class="flex justify-between items-center">
+        <div class="flex space-x-4">
+            <button onclick="showAddQuestionModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i> Nova Pergunta
+            </button>
+            <button onclick="showImportModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <i class="fas fa-file-import mr-2"></i> Importar CSV
+            </button>
+        </div>
+        
+        <div class="flex space-x-4">
+            <select id="categoryFilter" class="rounded-lg border-gray-300">
+                <option value="">Todas as Categorias</option>
+                {% for category in categories %}
+                <option value="{{ category.category_id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <select id="difficultyFilter" class="rounded-lg border-gray-300">
+                <option value="">Todas as Dificuldades</option>
+                {% for difficulty in difficulties %}
+                <option value="{{ difficulty.difficulty_id }}">{{ difficulty.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="text" id="searchInput" placeholder="Pesquisar..." 
+                   class="rounded-lg border-gray-300">
+        </div>
+    </div>
+
+    <!-- Questions Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Pergunta
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Categoria
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Dificuldade
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Tipo
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Ações
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for question in questions %}
+                <tr>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ question.content }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ question.category_name }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ question.difficulty_name }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ question.type_name }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if question.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ 'Ativo' if question.is_active else 'Inativo' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-medium space-x-2">
+                        <button onclick="editQuestion({{ question.question_id }})" 
+                                class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleQuestionStatus({{ question.question_id }})"
+                                class="{% if question.is_active %}text-red-600 hover:text-red-900{% else %}text-green-600 hover:text-green-900{% endif %}">
+                            <i class="fas {% if question.is_active %}fa-ban{% else %}fa-check{% endif %}"></i>
+                        </button>
+                        <button onclick="deleteQuestion({{ question.question_id }})"
+                                class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center">
+        <div class="text-sm text-gray-700">
+            Mostrando <span class="font-medium">{{ pagination.start }}</span> a 
+            <span class="font-medium">{{ pagination.end }}</span> de 
+            <span class="font-medium">{{ pagination.total }}</span> resultados
+        </div>
+        
+        <div class="space-x-2">
+            {% if pagination.prev_page %}
+            <a href="{{ url_for('admin_questions', page=pagination.prev_page) }}"
+               class="px-3 py-1 border rounded-md hover:bg-gray-100">
+                Anterior
+            </a>
+            {% endif %}
+            
+            {% if pagination.next_page %}
+            <a href="{{ url_for('admin_questions', page=pagination.next_page) }}"
+               class="px-3 py-1 border rounded-md hover:bg-gray-100">
+                Próxima
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Question Modal -->
+<div id="questionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium" id="modalTitle">Nova Pergunta</h3>
+            <button onclick="closeQuestionModal()" class="text-gray-600 hover:text-gray-900">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form id="questionForm" method="POST" class="space-y-4">
+            <input type="hidden" name="question_id" id="questionId">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Enunciado da Pergunta</label>
+                <textarea name="content" id="questionContent" rows="3" required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          placeholder="Digite o enunciado da pergunta..."></textarea>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Categoria</label>
+                    <select name="category_id" id="categorySelect" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Selecione uma categoria</option>
+                        {% for category in categories %}
+                        <option value="{{ category.category_id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Dificuldade</label>
+                    <select name="difficulty_id" id="difficultySelect" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Selecione a dificuldade</option>
+                        {% for difficulty in difficulties %}
+                        <option value="{{ difficulty.difficulty_id }}">{{ difficulty.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tipo de Pergunta</label>
+                    <select name="type_id" id="typeSelect" required onchange="toggleAnswerType()"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Selecione o tipo</option>
+                        {% for type in question_types %}
+                        <option value="{{ type.type_id }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Seção de Múltipla Escolha -->
+            <div id="multipleChoiceSection" class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <label class="block text-sm font-medium text-gray-700">Alternativas</label>
+                    <button type="button" onclick="addAlternative()" 
+                            class="text-sm text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-plus mr-1"></i> Adicionar Alternativa
+                    </button>
+                </div>
+                
+                <div id="alternativesContainer" class="space-y-3">
+                    <!-- As alternativas serão adicionadas aqui dinamicamente -->
+                </div>
+                
+                <div class="text-sm text-gray-500">
+                    * Selecione o círculo à esquerda para indicar a alternativa correta
+                </div>
+            </div>
+            
+            <!-- Seção de Resposta Escrita -->
+            <div id="writtenAnswerSection" class="hidden space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Resposta Correta</label>
+                    <input type="text" name="correct_answer" id="correctAnswer"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           placeholder="Digite a resposta correta">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        Respostas Alternativas
+                        <span class="text-sm text-gray-500">(separadas por |)</span>
+                    </label>
+                    <input type="text" name="alternative_answers" id="alternativeAnswers"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                           placeholder="resposta1|resposta2|resposta3">
+                    <p class="mt-1 text-sm text-gray-500">
+                        Use | para separar respostas alternativas que também serão consideradas corretas
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Seção de Feedback -->
+            <div class="space-y-4 border-t pt-4 mt-4">
+                <h4 class="font-medium text-gray-700">Feedback para o Usuário</h4>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Feedback para Resposta Correta</label>
+                    <textarea name="correct_feedback" id="correctFeedback" rows="2"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                              placeholder="Mensagem exibida quando o usuário acertar..."></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Feedback para Resposta Incorreta</label>
+                    <textarea name="incorrect_feedback" id="incorrectFeedback" rows="2"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                              placeholder="Mensagem exibida quando o usuário errar..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                <button type="button" onclick="closeQuestionModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">Importar Perguntas</h3>
+            <button onclick="closeImportModal()" class="text-gray-600 hover:text-gray-900">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form action="{{ url_for('admin_import_questions') }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Arquivo CSV
+                </label>
+                <input type="file" name="csv_file" accept=".csv" required
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0 file:text-sm file:font-semibold
+                              file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+            
+            <div class="flex justify-end space-x-2">
+                <button type="button" onclick="closeImportModal()"
+                        class="px-4 py-2 border rounded-md hover:bg-gray-100">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    Importar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let alternativeCount = 0;
+
+function addAlternative() {
+    const container = document.getElementById('alternativesContainer');
+    const div = document.createElement('div');
+    div.className = 'flex items-center space-x-2';
+    div.innerHTML = `
+        <input type="radio" name="correct_alternative" value="${alternativeCount}" required
+               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+        <input type="text" name="alternatives[]" required
+               class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+               placeholder="Digite a alternativa...">
+        <button type="button" onclick="removeAlternative(this)" 
+                class="text-red-600 hover:text-red-800">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    container.appendChild(div);
+    alternativeCount++;
+}
+
+function removeAlternative(button) {
+    button.parentElement.remove();
+}
+
+function toggleAnswerType() {
+    const type = document.getElementById('typeSelect').value;
+    const multipleChoice = document.getElementById('multipleChoiceSection');
+    const writtenAnswer = document.getElementById('writtenAnswerSection');
+    
+    if (type === '1') { // Múltipla escolha
+        multipleChoice.classList.remove('hidden');
+        writtenAnswer.classList.add('hidden');
+        // Adicionar 4 alternativas por padrão se não houver nenhuma
+        if (document.getElementById('alternativesContainer').children.length === 0) {
+            for (let i = 0; i < 4; i++) addAlternative();
+        }
+    } else { // Resposta escrita
+        multipleChoice.classList.add('hidden');
+        writtenAnswer.classList.remove('hidden');
+    }
+}
+
+function showAddQuestionModal() {
+    document.getElementById('modalTitle').textContent = 'Nova Pergunta';
+    document.getElementById('questionForm').reset();
+    document.getElementById('questionId').value = '';
+    document.getElementById('alternativesContainer').innerHTML = '';
+    toggleAnswerType();
+    document.getElementById('questionModal').classList.remove('hidden');
+}
+
+function closeQuestionModal() {
+    document.getElementById('questionModal').classList.add('hidden');
+}
+
+function showImportModal() {
+    document.getElementById('importModal').classList.remove('hidden');
+}
+
+function closeImportModal() {
+    document.getElementById('importModal').classList.add('hidden');
+}
+
+function editQuestion(questionId) {
+    // Fazer requisição AJAX para obter dados da pergunta
+    fetch(`/admin/questions/${questionId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('modalTitle').textContent = 'Editar Pergunta';
+            document.getElementById('questionId').value = data.question_id;
+            document.getElementById('questionContent').value = data.content;
+            document.getElementById('categorySelect').value = data.category_id;
+            document.getElementById('difficultySelect').value = data.difficulty_id;
+            document.getElementById('typeSelect').value = data.type_id;
+            
+            toggleAnswerType();
+            
+            if (data.type_id === 1) {  // Múltipla escolha
+                const alternatives = document.getElementsByName('alternatives[]');
+                const correctAlternative = document.getElementsByName('correct_alternative');
+                
+                data.alternatives.forEach((alt, index) => {
+                    alternatives[index].value = alt.content;
+                    correctAlternative[index].checked = alt.is_correct;
+                });
+            } else {  // Resposta escrita
+                document.getElementById('correctAnswer').value = data.correct_answer;
+                document.getElementById('alternativeAnswers').value = data.alternative_answers;
+            }
+            
+            document.getElementById('questionModal').classList.remove('hidden');
+        });
+}
+
+function deleteQuestion(questionId) {
+    if (confirm('Tem certeza que deseja excluir esta pergunta?')) {
+        fetch(`/admin/questions/${questionId}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro ao excluir pergunta');
+                }
+            });
+    }
+}
+
+function toggleQuestionStatus(questionId) {
+    fetch(`/admin/questions/${questionId}/toggle`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao alterar status da pergunta');
+            }
+        });
+}
+
+// Filtros
+document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
+document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 300));
+
+function applyFilters() {
+    const category = document.getElementById('categoryFilter').value;
+    const difficulty = document.getElementById('difficultyFilter').value;
+    const search = document.getElementById('searchInput').value;
+    
+    const params = new URLSearchParams(window.location.search);
+    if (category) params.set('category', category);
+    if (difficulty) params.set('difficulty', difficulty);
+    if (search) params.set('search', search);
+    
+    window.location.search = params.toString();
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Inicializar o formulário quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAnswerType();
+});
+</script>
+{% endblock %} 
